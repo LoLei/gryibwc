@@ -17,19 +17,21 @@ def main(args):
     config = configparser.ConfigParser()
     config.read('apikey.ini')
     key = config['api']['key']
+
     client = gr.Client(developer_key=key)
     result = client.Review.list(args.userid, name="read", sort="date_read",
-            per_page=200)
+                                per_page=200)
     reviews = result['reviews']['review']
 
     for review in reviews:
-        print(review['book']['title'])
-        print(review['read_at'])
         # Since output is sorted from recently read to older,
         # break when the first book of the previous year is reached
         year_read = int(dateutil.parser.parse(review['read_at']).year)
-        if (year_read < args.year):
+        if year_read < args.year:
             break
+        print(review['book']['title'])
+        print(review['book']['isbn'])
+        print(review['read_at'])
         print(year_read)
 
 
