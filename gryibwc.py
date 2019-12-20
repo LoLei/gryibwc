@@ -18,13 +18,17 @@ def main(args):
     config.read('apikey.ini')
     key = config['api']['key']
     client = gr.Client(developer_key=key)
-    books = client.Review.list(args.userid, "read")
-    pprint(books)
+    result = client.Review.list(args.userid, "read")
+    reviews = result['reviews']['review']
+
+    for review in reviews:
+        print(review['book']['title'])
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("userid", help="goodreads user id")
+    parser.add_argument("year", type=int, help="desired year")
     parser.add_argument(
             "--version",
             action="version",
