@@ -9,8 +9,8 @@ __license__ = "MIT"
 
 import argparse
 import configparser
-from pprint import pprint
 import goodreads_api_client as gr
+import dateutil.parser
 
 
 def main(args):
@@ -25,6 +25,12 @@ def main(args):
     for review in reviews:
         print(review['book']['title'])
         print(review['read_at'])
+        # Since output is sorted from recently read to older,
+        # break when the first book of the previous year is reached
+        year_read = int(dateutil.parser.parse(review['read_at']).year)
+        if (year_read < args.year):
+            break
+        print(year_read)
 
 
 if __name__ == "__main__":
