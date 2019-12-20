@@ -18,11 +18,13 @@ def main(args):
     config.read('apikey.ini')
     key = config['api']['key']
     client = gr.Client(developer_key=key)
-    result = client.Review.list(args.userid, "read")
+    result = client.Review.list(args.userid, name="read", sort="date_read",
+            per_page=200)
     reviews = result['reviews']['review']
 
     for review in reviews:
         print(review['book']['title'])
+        print(review['read_at'])
 
 
 if __name__ == "__main__":
