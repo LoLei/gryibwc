@@ -5,7 +5,7 @@ LONG_DESC = open('README.md').read()
 
 setuptools.setup(
     name="gryibwc",
-    version="0.9.3",
+    version="0.9.4",
     author="Lorenz Leitner",
     author_email="lrnz.ltnr@gmail.com",
     description="Get a word count for books read in a year",
