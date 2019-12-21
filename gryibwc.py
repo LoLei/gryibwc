@@ -20,7 +20,7 @@ from bs4 import BeautifulSoup
 def get_word_count(isbn):
     url = "https://www.readinglength.com/book/isbn-" + isbn
     r = requests.get(url)
-    soup = BeautifulSoup(r.text)
+    soup = BeautifulSoup(r.text, features="lxml")
     text = soup.get_text()
     wc = 0
     if "wordCount\"" in text:
