@@ -1,5 +1,5 @@
 # gryibwc
-**G**oodreads **Y**ear **I**n **B**ooks **W**ord **C**ount  
+**G**ood**r**eads **Y**ear **I**n **B**ooks **W**ord **C**ount  
 Get a word count for all books read in a year. :book:
 
 Word count might be more accurate than pages, 
