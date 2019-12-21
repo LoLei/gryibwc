@@ -8,7 +8,6 @@ __version__ = "0.1.0"
 __license__ = "MIT"
 
 import argparse
-import collections
 import configparser
 import goodreads_api_client as gr
 import dateutil.parser
@@ -29,6 +28,14 @@ def get_word_count(isbn):
         com_pos = wc_str.find(',')
         col_pos = wc_str.find(':')
         wc = int(wc_str[col_pos+1:com_pos])
+    elif "Word Count" in text:
+        pos = text.rfind("Word Count")
+        wc_str = text[pos:pos+22]
+        num_start_pos = wc_str.find('t')
+        num_end_pos = wc_str.rfind(' ')
+        wc_num_str = wc_str[num_start_pos+1:num_end_pos]
+        wc_num_str = wc_num_str.replace(',', '')
+        wc = int(wc_num_str)
     return wc
 
 def main(args):
