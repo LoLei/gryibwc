@@ -4,11 +4,11 @@ GRYIBWC
 """
 
 __author__ = "Lorenz Leitner"
-__version__ = "0.9.0"
+__version__ = "0.9.3"
 __license__ = "MIT"
 
 import argparse
-import configparser
+import os
 import goodreads_api_client as gr
 import dateutil.parser
 import requests
@@ -38,10 +38,24 @@ def get_word_count(isbn):
         wc = int(wc_num_str)
     return wc
 
-def main(args):
-    config = configparser.ConfigParser()
-    config.read('apikey.ini')
-    key = config['api']['key']
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("userid", help="goodreads user id")
+    parser.add_argument("year", type=int, help="desired year")
+    parser.add_argument(
+            "--version",
+            action="version",
+            version="%(prog)s (version {version})".format(version=__version__))
+    parser.add_argument("--fast", help="skip wait time - risk getting banned",
+                        action="store_true", default=False)
+
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    key = os.environ.get("PUBLIC_KEY")
 
     client = gr.Client(developer_key=key)
     result = client.Review.list(args.userid, name="read", sort="date_read",
@@ -83,15 +97,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("userid", help="goodreads user id")
-    parser.add_argument("year", type=int, help="desired year")
-    parser.add_argument(
-            "--version",
-            action="version",
-            version="%(prog)s (version {version})".format(version=__version__))
-    parser.add_argument("--fast", help="skip wait time - risk getting banned",
-                        action="store_true", default=False)
-
-    args = parser.parse_args()
-    main(args)
+    main()
