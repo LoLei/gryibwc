@@ -4,7 +4,7 @@ GRYIBWC
 """
 
 __author__ = "Lorenz Leitner"
-__version__ = "0.1.0"
+__version__ = "0.9.0"
 __license__ = "MIT"
 
 import argparse
