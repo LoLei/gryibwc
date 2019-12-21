@@ -8,10 +8,12 @@ __version__ = "0.1.0"
 __license__ = "MIT"
 
 import argparse
+import collections
 import configparser
 import goodreads_api_client as gr
 import dateutil.parser
 import requests
+import time
 from bs4 import BeautifulSoup
 
 
@@ -20,14 +22,13 @@ def get_word_count(isbn):
     r = requests.get(url)
     soup = BeautifulSoup(r.text)
     text = soup.get_text()
-    if "wordCount" in text:
-        print("Found stirng")
-        pos = text.rfind("wordCount")
+    wc = 0
+    if "wordCount\"" in text:
+        pos = text.rfind("wordCount\"")
         wc_str = text[pos:pos+18]
         com_pos = wc_str.find(',')
         col_pos = wc_str.find(':')
         wc = int(wc_str[col_pos+1:com_pos])
-        print(wc)
     return wc
 
 def main(args):
@@ -36,23 +37,42 @@ def main(args):
     key = config['api']['key']
 
     client = gr.Client(developer_key=key)
-    # result = client.Review.list(args.userid, name="read", sort="date_read",
-                                # per_page=200)
-    # reviews = result['reviews']['review']
+    result = client.Review.list(args.userid, name="read", sort="date_read",
+                                per_page=200)
+    reviews = result['reviews']['review']
 
-    # for review in reviews:
+    wc_all = 0
+    for review in reviews:
         # Since output is sorted from recently read to older,
         # break when the first book of the previous year is reached
-        # year_read = int(dateutil.parser.parse(review['read_at']).year)
-        # if year_read < args.year:
-            # break
-        # print(review['book']['title'])
-        # print(review['book']['isbn'])
-        # print(review['read_at'])
-        # print(year_read)
+        year_read = 0
+        try:
+            year_read = int(dateutil.parser.parse(review['read_at']).year)
+        except TypeError:
+            continue
+        if year_read < args.year:
+            break
+        if year_read != args.year:
+            continue
 
-    word_count = get_word_count("0765326361")
-    print(word_count)
+        title = review['book']['title']
+        print(title)
+        isbn = review['book']['isbn']
+        if isinstance(isbn, dict):
+            print("No ISBN found for {}".format(title))
+            continue
+        print("ISBN:", isbn)
+
+        wc = get_word_count(isbn)
+        print(wc)
+        if wc == 0:
+            print("No word count found for {}".format(isbn))
+        wc_all += wc
+        if not args.fast:
+            time.sleep(1)
+
+    print("Overall word count for year {}: {}".format(args.year, wc_all))
+    return wc_all
 
 
 if __name__ == "__main__":
@@ -63,6 +83,8 @@ if __name__ == "__main__":
             "--version",
             action="version",
             version="%(prog)s (version {version})".format(version=__version__))
+    parser.add_argument("--fast", help="skip wait time - risk getting banned",
+                        action="store_true", default=False)
 
     args = parser.parse_args()
     main(args)
